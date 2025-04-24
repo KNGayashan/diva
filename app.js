@@ -30,20 +30,20 @@ let loader = new GLTFLoader();
 //load the .glft file
 loader.load(
      './tide_pod/scene.gltf',
-     function(gltf){
+     function (gltf) {
           object = gltf.scene;
-          
+
           // Scale up the 3D model - adjust these values as needed
           object.scale.set(35, 35, 35);
-          
+
           // Set the fixed orientation
-          object.rotation.x = Math.PI/2; 
-          object.rotation.y = Math.PI/4; 
-          object.rotation.z = 0; 
-          
+          object.rotation.x = Math.PI / 2;
+          object.rotation.y = Math.PI / 4;
+          object.rotation.z = 0;
+
           // Add the object to our group instead of directly to the scene
           objectGroup.add(object);
-          
+
           // Initialize the model position based on current section
           modelMove();
      }
@@ -85,112 +85,150 @@ scene.add(light4);
 
 // Define different positions and rotations for each section
 const sectionPositions = [
-    {
-        id: 'hero',
-        position: { x: 0, y: 0, z: 0 },
-        rotation: { x: 0, y: Math.PI/4, z: 0 },
-        scale: 35
-    },
-    {
-        id: 'liquid1',
-        position: { x: 8, y: -1, z: -2 },
-        rotation: { x: 0, y: Math.PI/2, z: 0 },
-        scale: 30
-    },
-    {
-        id: 'liquid2',
-        position: { x: -8, y: 0, z: -2 },
-        rotation: { x: 0, y: -Math.PI/4, z: 0 },
-        scale: 25
-    },
-    {
-        id: 'liquid3',
-        position: { x: 8, y: 1, z: -3 },
-        rotation: { x: 0, y: Math.PI, z: 0 },
-        scale: 30
-    },
-    {
-        id: 'final',
-        position: { x: -8, y: 0, z: -2 },
-        rotation: { x: 0, y: 0, z: 0 },
-        scale: 30
-    }
+     {
+          id: 'hero',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 35
+     },
+     {
+          id: 'liquid1',
+          position: { x: 8, y: -1, z: -2 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 30
+     },
+     {
+          id: 'liquid2',
+          position: { x: -8, y: 0, z: -2 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 25
+     },
+     {
+          id: 'liquid3',
+          position: { x: 8, y: 1, z: -3 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 30
+     },
+     {
+          id: 'final',
+          position: { x: -8, y: 0, z: -2 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 30
+     }
+];
+
+// Mobile-specific positions for screens below 768px
+const sectionPositionsMobile = [
+     {
+          id: 'hero',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 30
+     },
+     {
+          id: 'liquid1',
+          position: { x: 0, y: -1, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 25
+     },
+     {
+          id: 'liquid2',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 25
+     },
+     {
+          id: 'liquid3',
+          position: { x: 0, y: 0, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 25
+     },
+     {
+          id: 'final',
+          position: { x: 0, y: -3, z: 0 },
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 25
+     }
 ];
 
 // Function to handle model movement based on current section
 const modelMove = () => {
-    if (!object) return;
-    
-    const sections = document.querySelectorAll('section');
-    let currentSection;
-    
-    sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        // Check if section is in view (adjust the threshold as needed)
-        if (rect.top <= window.innerHeight * 0.6 && rect.bottom >= window.innerHeight * 0.4) {
-            currentSection = section.className;
-        }
-    });
-    
-    if (!currentSection) return;
-    
-    // Find the configuration for the current section
-    let sectionConfig = sectionPositions.find(
-        (config) => currentSection.includes(config.id)
-    );
-    
-    if (sectionConfig) {
-        // Animate the object group to the new position and rotation
-        gsap.to(objectGroup.position, {
-            x: sectionConfig.position.x,
-            y: sectionConfig.position.y,
-            z: sectionConfig.position.z,
-            duration: 2,
-            ease: "power2.out"
-        });
-        
-        gsap.to(objectGroup.rotation, {
-            x: sectionConfig.rotation.x,
-            y: sectionConfig.rotation.y,
-            z: sectionConfig.rotation.z,
-            duration: 2,
-            ease: "power2.out"
-        });
-        
-        gsap.to(object.scale, {
-            x: sectionConfig.scale,
-            y: sectionConfig.scale,
-            z: sectionConfig.scale,
-            duration: 2,
-            ease: "power2.out"
-        });
-    }
+     if (!object) return;
+
+     const sections = document.querySelectorAll('section');
+     let currentSection;
+
+     sections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          // Check if section is in view (adjust the threshold as needed)
+          if (rect.top <= window.innerHeight * 0.6 && rect.bottom >= window.innerHeight * 0.4) {
+               currentSection = section.className;
+          }
+     });
+
+     if (!currentSection) return;
+
+     // Determine which position array to use based on screen width
+     const isMobile = window.innerWidth <= 768;
+     const positions = isMobile ? sectionPositionsMobile : sectionPositions;
+
+     // Find the configuration for the current section
+     let sectionConfig = positions.find(
+          (config) => currentSection.includes(config.id)
+     );
+
+     if (sectionConfig) {
+          // Animate the object group to the new position and rotation
+          gsap.to(objectGroup.position, {
+               x: sectionConfig.position.x,
+               y: sectionConfig.position.y,
+               z: sectionConfig.position.z,
+               duration: 2,
+               ease: "power2.out"
+          });
+
+          gsap.to(objectGroup.rotation, {
+               x: sectionConfig.rotation.x,
+               y: sectionConfig.rotation.y,
+               z: sectionConfig.rotation.z,
+               duration: 2,
+               ease: "power2.out"
+          });
+
+          gsap.to(object.scale, {
+               x: sectionConfig.scale,
+               y: sectionConfig.scale,
+               z: sectionConfig.scale,
+               duration: 2,
+               ease: "power2.out"
+          });
+     }
 };
 
 // Add a slight rotation to make the model more dynamic
-function animate() {   
-    requestAnimationFrame(animate);
-    
-    // Only add a slight rotation if not transitioning between sections
-    if (!gsap.isTweening(objectGroup.rotation)) {
-        objectGroup.rotation.y += 0.01;
-    }
-    
-    renderer.render(scene, camera);
+function animate() {
+     requestAnimationFrame(animate);
+
+     // Only add a slight rotation if not transitioning between sections
+     if (!gsap.isTweening(objectGroup.rotation)) {
+          objectGroup.rotation.y += 0.01;
+     }
+
+     renderer.render(scene, camera);
 }
 animate();
 
 // Listen for scroll events to update model position
 window.addEventListener('scroll', () => {
-    modelMove();
+     modelMove();
 });
 
 // Make the animation responsive
 window.addEventListener('resize', () => {
-    width = canvasform.offsetWidth;
-    height = canvasform.offsetHeight;
-    renderer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
+     width = canvasform.offsetWidth;
+     height = canvasform.offsetHeight;
+     renderer.setSize(width, height);
+     camera.aspect = width / height;
+     camera.updateProjectionMatrix();
+     renderer.setSize(width, height);
 });
