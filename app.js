@@ -145,7 +145,7 @@ const sectionPositionsMobile = [
      },
      {
           id: 'final',
-          position: { x: 0, y: -3, z: 0 },
+          position: { x: 0, y: -5, z: 0 },
           rotation: { x: 0, y: 0, z: 0 },
           scale: 25
      }
